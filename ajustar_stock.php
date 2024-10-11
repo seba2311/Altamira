@@ -21,30 +21,43 @@ try {
 
     $conn->beginTransaction();
 
-    // Obtener stock actual
+    // Verificar si existe un registro de stock para el producto
     $stmt = $conn->prepare("SELECT stock_cantidad FROM stock WHERE stock_producto = :codigo");
     $stmt->execute(['codigo' => $codigo]);
     $stockActual = $stmt->fetchColumn();
 
     if ($stockActual === false) {
-        throw new Exception("Producto no encontrado");
+        // No existe stock, crear uno nuevo
+        $nuevoStock = $ingreso - $salida;
+        if ($nuevoStock < 0) {
+            throw new Exception("No se puede crear un stock negativo");
+        }
+        
+        $stmt = $conn->prepare("INSERT INTO stock (stock_producto, stock_cantidad) VALUES (:codigo, :nuevoStock)");
+        $stmt->execute([
+            'codigo' => $codigo,
+            'nuevoStock' => $nuevoStock
+        ]);
+        
+        $mensaje = "Nuevo stock creado y ajustado correctamente";
+    } else {
+        // Existe stock, actualizarlo
+        $nuevoStock = $stockActual + $ingreso - $salida;
+        if ($nuevoStock < 0) {
+            throw new Exception("El stock no puede ser negativo");
+        }
+        
+        $stmt = $conn->prepare("UPDATE stock SET stock_cantidad = :nuevoStock WHERE stock_producto = :codigo");
+        $stmt->execute([
+            'nuevoStock' => $nuevoStock,
+            'codigo' => $codigo
+        ]);
+        
+        $mensaje = "Stock actualizado correctamente";
     }
-
-    $nuevoStock = $stockActual + $ingreso - $salida;
-
-    if ($nuevoStock < 0) {
-        throw new Exception("El stock no puede ser negativo");
-    }
-
-    // Actualizar stock
-    $stmt = $conn->prepare("UPDATE stock SET stock_cantidad = :nuevoStock WHERE stock_producto = :codigo");
-    $stmt->execute([
-        'nuevoStock' => $nuevoStock,
-        'codigo' => $codigo
-    ]);
 
     $conn->commit();
-    sendJsonResponse(true, "Stock actualizado correctamente");
+    sendJsonResponse(true, $mensaje);
 } catch (Exception $e) {
     $conn->rollBack();
     sendJsonResponse(false, $e->getMessage());

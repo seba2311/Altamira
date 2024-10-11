@@ -25,6 +25,7 @@ if (!isset($nombreUsuario)) {
             <div class="menu">
                 <a class="item">Toma de Inventario</a>
                 <a class="item" href="ajuste.php">Ajuste de Stock</a>
+                <a class="item" href="lista_nota_venta.php">Notas de venta</a>
             </div>
         </div>
         <div class="ui dropdown item">
