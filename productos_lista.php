@@ -15,8 +15,12 @@ $total_productos = $stmt_total->fetchColumn();
 // Calcular el número total de páginas
 $total_paginas = ceil($total_productos / $productos_por_pagina);
 
-// Consulta SQL para obtener los productos de la página actual
-$sql = "SELECT pro_codigo, pro_nombre FROM producto ORDER BY pro_codigo LIMIT :inicio, :productos_por_pagina";
+// Consulta SQL para obtener los productos de la página actual con su stock
+$sql = "SELECT p.pro_codigo, p.pro_nombre, COALESCE(s.stock_cantidad, 0) as stock_cantidad
+        FROM producto p
+        LEFT JOIN stock s ON p.pro_codigo = s.stock_producto
+        ORDER BY p.pro_codigo
+        LIMIT :inicio, :productos_por_pagina";
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(':inicio', $inicio, PDO::PARAM_INT);
 $stmt->bindParam(':productos_por_pagina', $productos_por_pagina, PDO::PARAM_INT);
@@ -34,6 +38,7 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th class="center aligned">#</th>
                     <th>Código de producto</th>
                     <th>Nombre de producto</th>
+                    <th class="center aligned">Stock Disponible</th>
                 </tr>
             </thead>
             <tbody>
@@ -41,7 +46,8 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <tr>
                         <td class="center aligned"><?php echo htmlspecialchars($inicio + $index + 1); ?></td>
                         <td data-label="Código"><?php echo htmlspecialchars($producto['pro_codigo']); ?></td>
-                        <td data-label="Nombre"><?php echo htmlspecialchars(utf8_encode($producto['pro_nombre'])); ?></td>
+                        <td data-label="Nombre"><?php echo utf8_encode($producto['pro_nombre']); ?></td>
+                        <td class="center aligned" data-label="Stock"><?php echo htmlspecialchars($producto['stock_cantidad']); ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
