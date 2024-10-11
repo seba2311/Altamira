@@ -46,6 +46,7 @@ $notas_venta = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <table class="ui celled table">
             <thead>
                 <tr>
+                    <th width="1" class="center aligned">#</th>
                     <th>Folio</th>
                     <th>Fecha</th>
                     <th>Glosa</th>
@@ -53,8 +54,13 @@ $notas_venta = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($notas_venta as $nota): ?>
+                <?php 
+                $contador=0;
+                foreach ($notas_venta as $nota):
+                    $contador++;
+                 ?>
                     <tr>
+                        <td class="center aligned"><b><?php echo htmlspecialchars($contador)?></b></td>
                         <td><?php echo htmlspecialchars($nota['nv_folio']); ?></td>
                         <td><?php echo date('d-m-Y', strtotime($nota['nv_fecha'])); ?></td>
                         <td><?php echo htmlspecialchars($nota['nv_glosa']); ?></td>
