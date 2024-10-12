@@ -7,15 +7,19 @@ if (!isset($_SESSION['usuario'])) {
 $nombreUsuario = htmlspecialchars($_SESSION['usuario']);
 
 require_once "graficos.php";
+require_once "grafico_ventas.php"; // Asegúrate de que este archivo existe y contiene las funciones necesarias
+
 $topProducts = obtenerTopProductosStock(10);
 $productosBajos = obtenerProductosBajos(10);
 
+// Obtener datos para el nuevo gráfico de ventas
+$fechaInicio = isset($_GET['fecha_inicio']) ? $_GET['fecha_inicio'] : date('Y-m-d', strtotime('-1 month'));
+$fechaFin = isset($_GET['fecha_fin']) ? $_GET['fecha_fin'] : date('Y-m-d');
+$productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10);
 
 ?>
 <!DOCTYPE html>
 <html lang="es">
-<meta charset="UTF-8">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,16 +79,16 @@ $productosBajos = obtenerProductosBajos(10);
         width: 100%;
         height: 100%; /* Ocupará todo el alto del contenedor */
     }
-
-        .chart-container {
-        background-color: #f9f9f9;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        height: 400px; /* Altura fija */
-        position: relative; /* Necesario para que Chart.js pueda posicionar el gráfico correctamente */
-    }
+    .chart-container {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 400px;
+            position: relative;
+            margin-bottom: 20px;
+        }
 
         .ui.header {
             margin-bottom: 15px;
@@ -95,6 +99,8 @@ $productosBajos = obtenerProductosBajos(10);
         .main.container {
             margin-top: 2em;
             margin-bottom: 2em;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Estilos responsivos */
@@ -106,9 +112,16 @@ $productosBajos = obtenerProductosBajos(10);
                 /* Altura reducida para dispositivos móviles */
             }
         }
+        #ventasChart {
+            width: 100%;
+            height: 100%;
+        }
+        .date-range-form {
+            margin-bottom: 15px;
+        }
+   
     </style>
 </head>
-
 <body>
     <?php include 'menu.php'; ?>
 
@@ -119,69 +132,82 @@ $productosBajos = obtenerProductosBajos(10);
     </div>
 
     <div class="main container">
-    <div class="ui two column stackable grid">
-        <div class="column">
-            <div class="chart-container">
-                <h2 class="ui header">Top 10 Productos con Mayor Stock</h2>
-                <canvas id="stockChartHigh"></canvas>
+        <div class="ui two column stackable grid">
+            <div class="column">
+                <div class="chart-container">
+                    <h2 class="ui header">Top 10 Productos con Mayor Stock</h2>
+                    <canvas id="stockChartHigh"></canvas>
+                </div>
+            </div>
+            <div class="column">
+                <div class="chart-container">
+                    <h2 class="ui header">Top 10 Productos con Menor Stock</h2>
+                    <canvas id="stockChartLow"></canvas>
+                </div>
             </div>
         </div>
-        <div class="column">
-            <div class="chart-container">
-                <h2 class="ui header">Top 10 Productos con Menor Stock</h2>
-                <canvas id="stockChartLow"></canvas>
+        
+        <div class="ui one column stackable grid" id="grafico_venta">
+            <div class="column">
+                <div class="chart-container">
+                    <h2 class="ui header">Top 10 Productos Más Vendidos por rangos de fecha</h2>
+                    <form class="ui form date-range-form" method="GET">
+                        <div class="two fields">
+                            <div class="field">
+                                <label>Fecha Inicio</label>
+                                <input type="date" name="fecha_inicio" value="<?php echo $fechaInicio; ?>">
+                            </div>
+                            <div class="field">
+                                <label>Fecha Fin</label>
+                                <input type="date" name="fecha_fin" value="<?php echo $fechaFin; ?>">
+                            </div>
+                        </div>
+                        <button class="ui button" type="submit">Actualizar</button>
+                    </form>
+                    <canvas id="ventasChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
 
     <script>
         function updateDateTime() {
             const now = new Date();
             const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
             };
             $('#current-datetime').text(now.toLocaleDateString('es-ES', options).replace(',', '|'));
         }
+
         $(document).ready(function() {
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
 
-        // Inicializar los menús desplegables
-        $('.ui.dropdown').dropdown();
+            $('.ui.dropdown').dropdown();
 
-        // Crear el gráfico de productos con mayor stock
-        var ctxHigh = document.getElementById('stockChartHigh').getContext('2d');
-        var chartConfigHigh = <?php echo generarGraficoTopProductos('stockChartHigh', $topProducts); ?>;
-        
-        // Evaluar las funciones de callback
-        if (chartConfigHigh.options && chartConfigHigh.options.plugins && chartConfigHigh.options.plugins.tooltip) {
-            for (var callbackName in chartConfigHigh.options.plugins.tooltip.callbacks) {
-                chartConfigHigh.options.plugins.tooltip.callbacks[callbackName] = 
-                    eval('(' + chartConfigHigh.options.plugins.tooltip.callbacks[callbackName] + ')');
+            // Función para inicializar un gráfico
+            function initChart(canvasId, chartConfig) {
+                var ctx = document.getElementById(canvasId).getContext('2d');
+                if (chartConfig.options && chartConfig.options.plugins && chartConfig.options.plugins.tooltip) {
+                    for (var callbackName in chartConfig.options.plugins.tooltip.callbacks) {
+                        chartConfig.options.plugins.tooltip.callbacks[callbackName] = 
+                            eval('(' + chartConfig.options.plugins.tooltip.callbacks[callbackName] + ')');
+                    }
+                }
+                try {
+                    new Chart(ctx, chartConfig);
+                } catch (error) {
+                    console.error('Error al crear el gráfico ' + canvasId + ':', error);
+                    $('#' + canvasId).parent().append('<p class="ui red message">Error al cargar el gráfico. Por favor, intente nuevamente.</p>');
+                }
             }
-        }
 
-        // Crear el gráfico de productos con menor stock
-        var ctxLow = document.getElementById('stockChartLow').getContext('2d');
-        var chartConfigLow = <?php echo generarGraficoProductosBajos('stockChartLow', $productosBajos); ?>;
-
-        try {
-            new Chart(ctxHigh, chartConfigHigh);
-            new Chart(ctxLow, chartConfigLow);
-        } catch (error) {
-            console.error('Error al crear los gráficos:', error);
-            $('.main.container').append('<p class="ui red message">Error al cargar los gráficos. Por favor, intente nuevamente.</p>');
-        }
-    });
+            // Inicializar gráficos
+            initChart('stockChartHigh', <?php echo generarGraficoTopProductos('stockChartHigh', $topProducts); ?>);
+            initChart('stockChartLow', <?php echo generarGraficoProductosBajos('stockChartLow', $productosBajos); ?>);
+            initChart('ventasChart', <?php echo generarGraficoProductosMasVendidos('ventasChart', $productosMasVendidos); ?>);
+        });
     </script>
 </body>
-
 </html>

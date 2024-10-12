@@ -26,7 +26,6 @@ $stmt->bindParam(':por_pagina', $por_pagina, PDO::PARAM_INT);
 $stmt->execute();
 $notas_venta = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -39,10 +38,8 @@ $notas_venta = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <?php include 'menu.php'; ?>
-
     <div class="ui container" style="margin-top: 20px;">
         <h2 class="ui header">Listado de Notas de Venta</h2>
-
         <table class="ui celled table">
             <thead>
                 <tr>
@@ -73,7 +70,6 @@ $notas_venta = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endforeach; ?>
             </tbody>
         </table>
-
         <?php if ($total_paginas > 1): ?>
             <div class="ui pagination menu">
                 <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
@@ -86,16 +82,46 @@ $notas_venta = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <script>
-    $(document).ready(function() {
-        $('.ui.dropdown').dropdown(); // Inicializa los dropdowns del menú
+   $(document).ready(function() {
+        $('.ui.dropdown').dropdown();
+        
+        // Asegurarse de que el módulo Toast esté disponible
+        if (typeof $.fn.toast === 'undefined') {
+            $.fn.toast = function(parameters) {
+                return $(this).each(function() {
+                    var $this = $(this);
+                    if (typeof $.fn.transition === 'undefined') {
+                        console.error('El módulo Transition de Semantic UI es necesario para Toast');
+                        return;
+                    }
+                    var $context = $('body');
+                    var $toast = $('<div class="ui toast"></div>');
+                    $toast.addClass(parameters.class || '');
+                    $toast.append('<div class="content">' + (parameters.title ? '<div class="header">' + parameters.title + '</div>' : '') + '<div class="message">' + parameters.message + '</div></div>');
+                    $context.append($toast);
+                    $toast.transition({
+                        animation: 'fade up',
+                        duration: '500ms'
+                    });
+                    setTimeout(function() {
+                        $toast.transition({
+                            animation: 'fade up',
+                            duration: '500ms',
+                            onComplete: function() {
+                                $toast.remove();
+                            }
+                        });
+                    }, 3000);
+                });
+            };
+        }
     });
 
     function verDetalle(folio) {
-        // Aquí puedes agregar la lógica para ver el detalle de la nota de venta
         console.log("Ver detalle de la nota de venta con folio: " + folio);
-        // Por ejemplo, podrías redirigir a una página de detalles:
-        // window.location.href = 'detalle_nota_venta.php?folio=' + folio;
+        window.location.href = 'nota_venta_detalle.php?folio=' + folio;
     }
+
     </script>
 </body>
 </html>

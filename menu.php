@@ -9,9 +9,9 @@ if (!isset($nombreUsuario)) {
         <div class="logo-container item">
             <img src="imagenes/altamira.jpg" alt="Altamira Logo">
         </div>
-        <div class="MENU">
-        <a class="item" href="pag_principal.php">RFID</a>
-          
+        <div class="ui item">
+            <a href="pag_principal.php">RFID</a>
+
         </div>
         <div class="ui dropdown item">
             PRODUCTOS <i class="dropdown icon"></i>
@@ -49,7 +49,7 @@ if (!isset($nombreUsuario)) {
 </div>
 
 <script>
-$(document).ready(function() {
-    $('.ui.dropdown').dropdown();
-});
+    $(document).ready(function() {
+        $('.ui.dropdown').dropdown();
+    });
 </script>

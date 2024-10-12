@@ -27,25 +27,8 @@ $nombreUsuario = htmlspecialchars($_SESSION['usuario']);
 </head>
 
 <body>
-    <div class="ui blue inverted menu">
-        <div class="ui container">
-            <div class="logo-container item">
-                <img src="imagenes/altamira.jpg" alt="Altamira Logo" style="max-height: 40px;">
-            </div>
-            <a class="item" href="pag_principal.php">Inicio</a>
-            <a class="item active">CONFIGURACIONES</a>
-            <div class="right menu">
-                <a class="item user-info" href="perfil_usuario.php">
-                    <i class="user icon"></i>
-                    <?php echo $nombreUsuario; ?>
-                </a>
-                <a class="item" href="logout.php">
-                    <i class="sign-out icon"></i>
-                    Cerrar sesión
-                </a>
-            </div>
-        </div>
-    </div>
+<?php include 'menu.php'; ?>
+
 
     <div class="ui main container">
         <h2 class="ui header">Configuraciones</h2>
