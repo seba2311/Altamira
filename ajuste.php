@@ -1,6 +1,7 @@
 <?php
 session_start(); if (!isset($_SESSION['usuario'])) { header("Location: index.php"); exit(); }
 require "config.php";
+
 function getProductos($conn) {
     $productos = [];
     $query = "SELECT pro_codigo, pro_nombre FROM producto";
@@ -14,7 +15,6 @@ function getProductos($conn) {
     }
     return $productos;
 }
-include 'header.php';
 
 $productos = getProductos($conn);
 ?>
@@ -72,6 +72,7 @@ $productos = getProductos($conn);
     </style>
 </head>
 <body>
+    <?php include 'menu.php'; ?>
     <div class="ui container" style="margin-top: 20px;">
         <h2 class="ui header">Seleccionar Producto</h2>
         <select id="productoSelector" style="width: 100%;">

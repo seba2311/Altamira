@@ -1,5 +1,9 @@
 <?php
-
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header("Location: index.php");
+    exit();
+}
 $nombreUsuario = htmlspecialchars($_SESSION['usuario']);
 ?>
 <!DOCTYPE html>
@@ -9,6 +13,7 @@ $nombreUsuario = htmlspecialchars($_SESSION['usuario']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altamira Logística</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" href="ruta/a/temas.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
     <style>

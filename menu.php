@@ -35,11 +35,6 @@ if (!isset($nombreUsuario)) {
                 <a class="item">Otras Configuraciones</a>
             </div>
         </div>
-        <div class="ui right item">
-            <button id="themeToggle" class="ui icon button">
-                <i class="moon icon"></i>
-            </button>
-        </div>
         <div class="right menu">
             <div class="ui dropdown item">
                 <i class="user icon"></i>
