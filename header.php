@@ -1,10 +1,5 @@
 <?php
-session_start();
-if (!isset($_SESSION['usuario'])) {
-    header("Location: index.php");
-    exit();
-}
-$nombreUsuario = htmlspecialchars($_SESSION['usuario']);
+
 ?>
 <!DOCTYPE html>
 <html lang="es">

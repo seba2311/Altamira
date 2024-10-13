@@ -12,14 +12,14 @@ $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 $inicio = ($pagina - 1) * $por_pagina;
 
 // Consulta para obtener el total de registros
-$sql_total = "SELECT COUNT(*) as total FROM nota_venta";
+$sql_total = "SELECT COUNT(*) as total FROM guia_entrada";
 $resultado_total = $conn->query($sql_total);
 $fila_total = $resultado_total->fetch(PDO::FETCH_ASSOC);
 $total_registros = $fila_total['total'];
 $total_paginas = ceil($total_registros / $por_pagina);
 
 // Consulta para obtener las notas de venta de la página actual
-$sql = "SELECT nv_folio, nv_fecha, nv_glosa FROM nota_venta ORDER BY nv_fecha DESC, nv_folio DESC LIMIT :inicio, :por_pagina";
+$sql = "SELECT guia_folio, guia_fecha, guia_glosa FROM guia_entrada ORDER BY guia_fecha DESC, guia_folio DESC LIMIT :inicio, :por_pagina";
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(':inicio', $inicio, PDO::PARAM_INT);
 $stmt->bindParam(':por_pagina', $por_pagina, PDO::PARAM_INT);
@@ -58,11 +58,11 @@ $notas_venta = $stmt->fetchAll(PDO::FETCH_ASSOC);
                  ?>
                     <tr>
                         <td class="center aligned"><b><?php echo htmlspecialchars($contador)?></b></td>
-                        <td><?php echo htmlspecialchars($nota['nv_folio']); ?></td>
-                        <td><?php echo date('d-m-Y', strtotime($nota['nv_fecha'])); ?></td>
-                        <td><?php echo htmlspecialchars($nota['nv_glosa']); ?></td>
+                        <td><?php echo htmlspecialchars($nota['guia_folio']); ?></td>
+                        <td><?php echo date('d-m-Y', strtotime($nota['guia_fecha'])); ?></td>
+                        <td><?php echo htmlspecialchars($nota['guia_glosa']); ?></td>
                         <td>
-                            <button class="ui icon button tiny" onclick="verDetalle(<?php echo $nota['nv_folio']; ?>)">
+                            <button class="ui icon button tiny" onclick="verDetalle(<?php echo $nota['guia_folio']; ?>)">
                                 <i class="search icon"></i>
                             </button>
                         </td>
@@ -118,8 +118,8 @@ $notas_venta = $stmt->fetchAll(PDO::FETCH_ASSOC);
     });
 
     function verDetalle(folio) {
-        console.log("Ver detalle de la nota de venta con folio: " + folio);
-        window.location.href = 'nota_venta_detalle.php?folio=' + folio;
+        console.log("Ver detalle de la guia de entrada con folio: " + folio);
+        window.location.href = 'guia_entrada_detalle.php?folio=' + folio;
     }
 
     </script>

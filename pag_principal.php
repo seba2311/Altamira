@@ -162,7 +162,7 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
                                 <input type="date" name="fecha_fin" value="<?php echo $fechaFin; ?>">
                             </div>
                         </div>
-                        <button class="ui button" type="submit">Actualizar</button>
+                        <button class="ui button blue" type="submit">Actualizar</button>
                     </form>
                     <canvas id="ventasChart"></canvas>
                 </div>
