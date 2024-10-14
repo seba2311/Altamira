@@ -27,12 +27,14 @@ if (!isset($nombreUsuario)) {
         <div class="ui dropdown item">
             INGRESOS <i class="dropdown icon"></i>
             <div class="menu">
-                <a class="item" href="lista_guia_entrada.php">Lista de Guias de venta</a>
+                <a class="item" href="crear_guia_entrada.php">Crear Guia de Ingreso</a>
+                <a class="item" href="lista_guia_entrada.php">Lista de Guias de Ingreso</a>
             </div>
         </div>
         <div class="ui dropdown item">
             VENTAS <i class="dropdown icon"></i>
             <div class="menu">
+                <a class="item" href="crear_nota_venta.php">Crear Nota de Venta</a>
                 <a class="item" href="lista_nota_venta.php">Lista Notas de venta</a>
             </div>
         </div>
