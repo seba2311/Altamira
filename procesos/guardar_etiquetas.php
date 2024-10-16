@@ -6,7 +6,7 @@ if (!isset($_SESSION['usuario'])) {
     exit;
 }
 
-require "config.php";
+require "../config.php";
 
 header('Content-Type: application/json');
 

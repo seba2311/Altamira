@@ -2,10 +2,10 @@
 // config.php
 
 // Datos de conexión a la base de datos
-$host = '192.168.18.170:3060';
+$host = '127.0.0.1:3306';
 $db_name = 'altamira';
 $username = 'root';
-$password = 'root';
+$password = '';
 
 // Opciones para PDO
 $options = [

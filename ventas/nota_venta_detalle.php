@@ -4,7 +4,7 @@ if (!isset($_SESSION['usuario'])) {
     header("Location: index.php");
     exit();
 }
-require "config.php";
+require "../config.php";
 
 $folio = isset($_GET['folio']) ? $_GET['folio'] : null;
 
@@ -45,7 +45,7 @@ $detalles = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
 </head>
 <body>
-    <?php include 'menu.php'; ?>
+    <?php include '../menu.php'; ?>
     <div class="ui container" style="margin-top: 20px;">
         <h2 class="ui header">Detalle de Nota de Venta</h2>
         <div class="ui segment">

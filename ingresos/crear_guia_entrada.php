@@ -4,7 +4,7 @@ if (!isset($_SESSION['usuario'])) {
     header("Location: index.php");
     exit();
 }
-require "config.php";
+require "../config.php";
 
 $mensaje = '';
 $tipoMensaje = '';
@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-    <?php include 'menu.php'; ?>
+    <?php include '../menu.php'; ?>
 
     <div class="ui container" style="margin-top: 20px;">
         <h2 class="ui header">Crear Guía de Entrada y Etiquetas</h2>

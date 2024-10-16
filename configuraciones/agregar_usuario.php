@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config.php';
+require_once '../config.php';
 
 if (!isset($_SESSION['usuario'])) {
     header("Location: index.php");
@@ -51,25 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-    <div class="ui blue inverted menu">
-        <div class="ui container">
-            <div class="logo-container item">
-                <img src="imagenes/altamira.jpg" alt="Altamira Logo" style="max-height: 40px;">
-            </div>
-            <a class="item" href="pag_principal.php">Inicio</a>
-            <a class="item" href="configuraciones.php">CONFIGURACIONES</a>
-            <div class="right menu">
-                <a class="item user-info" href="perfil_usuario.php">
-                    <i class="user icon"></i>
-                    <?php echo $nombreUsuario; ?>
-                </a>
-                <a class="item" href="logout.php">
-                    <i class="sign-out icon"></i>
-                    Cerrar sesión
-                </a>
-            </div>
-        </div>
-    </div>
+    <? include '../menu.php' ?>
 
     <div class="ui main container">
         <h2 class="ui header">Agregar Nuevo Usuario</h2>

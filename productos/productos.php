@@ -1,6 +1,6 @@
 <?php
-include 'header.php';
-require "config.php";
+include '../header.php';
+require "../config.php";
 // Inicializar variables para mensajes
 $mensaje = '';
 $tipo_mensaje = '';
@@ -88,4 +88,4 @@ $(document).ready(function() {
 });
 </script>
 
-<?php include 'footer.php'; ?>
+<?php include '../footer.php'; ?>

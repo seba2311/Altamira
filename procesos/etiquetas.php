@@ -4,7 +4,7 @@ if (!isset($_SESSION['usuario'])) {
     header("Location: index.php");
     exit();
 }
-require "config.php";
+require "../config.php";
 
 function getProductos($conn)
 {
@@ -77,7 +77,7 @@ $ultimaEtiqueta = obtenerUltimaEtiqueta($conn);
 </head>
 
 <body>
-    <?php include 'menu.php'; ?>
+    <?php include '../menu.php'; ?>
 
     <div class="ui container" style="margin-top: 20px;">
         <h2 class="ui header">Crear Etiquetas</h2>

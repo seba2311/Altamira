@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require "config.php";
+require "../config.php";
 
 function sendJsonResponse($success, $message = '') {
     echo json_encode([

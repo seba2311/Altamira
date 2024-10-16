@@ -1,6 +1,6 @@
 <?php
 session_start(); if (!isset($_SESSION['usuario'])) { header("Location: index.php"); exit(); }
-require "config.php";
+require "../config.php";
 
 function getProductos($conn) {
     $productos = [];
@@ -72,7 +72,7 @@ $productos = getProductos($conn);
     </style>
 </head>
 <body>
-    <?php include 'menu.php'; ?>
+    <?php include '../menu.php'; ?>
     <div class="ui container" style="margin-top: 20px;">
         <h2 class="ui header">Seleccionar Producto</h2>
         <select id="productoSelector" style="width: 100%;">

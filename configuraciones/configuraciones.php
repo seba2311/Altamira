@@ -27,7 +27,7 @@ $nombreUsuario = htmlspecialchars($_SESSION['usuario']);
 </head>
 
 <body>
-<?php include 'menu.php'; ?>
+<?php include '../menu.php'; ?>
 
 
     <div class="ui main container">

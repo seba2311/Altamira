@@ -1,6 +1,6 @@
 <?php
-include 'header.php';
-require "config.php";
+include '../header.php';
+require "../config.php";
 
 // Configuración de la paginación
 $productos_por_pagina = 15;
@@ -68,4 +68,4 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include '../footer.php'; ?>

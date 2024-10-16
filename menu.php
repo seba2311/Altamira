@@ -2,55 +2,41 @@
 if (!isset($nombreUsuario)) {
     $nombreUsuario = isset($_SESSION['usuario']) ? htmlspecialchars($_SESSION['usuario']) : 'Usuario';
 }
+require 'navegacion.php';
+$url_base="http://localhost:8080/Altamira/";
 ?>
 
 <div class="ui blue inverted menu" id="main-menu">
     <div class="ui container">
         <div class="logo-container item">
-            <img src="imagenes/altamira.jpg" alt="Altamira Logo">
+            <img src="<?echo $url_base?>imagenes/altamira.jpg" alt="Altamira Logo">
         </div>
-        <a class="item" href="pag_principal.php">RFID</a>
-        <div class="ui dropdown item">
-            PRODUCTOS <i class="dropdown icon"></i>
-            <div class="menu">
-                <a class="item" href="productos.php">Crear nuevo producto</a>
-                <a class="item" href="productos_lista.php">Lista de productos</a>
-            </div>
+        <a class="item" href="<?echo $url_base?>pag_principal.php">RFID</a>
+
+    <?        
+    foreach($navegacion as $seccion => $paginas){
+    ?>
+    <div class="ui dropdown item">
+        <? echo $seccion;?> <i class="dropdown icon"></i>
+        <div class="menu">
+            <?
+            foreach($paginas as $nombre => $url){
+                echo "<a class='item' href='$url_base$url'>$nombre</a>";
+            }
+            ?>
         </div>
-        <div class="ui dropdown item">
-            PROCESOS <i class="dropdown icon"></i>
-            <div class="menu">
-                <a class="item" href="etiquetas.php">Creación de Etiquetas</a>
-                <a class="item" href="ajuste.php">Ajuste de Stock</a>
-            </div>
-        </div>
-        <div class="ui dropdown item">
-            INGRESOS <i class="dropdown icon"></i>
-            <div class="menu">
-                <a class="item" href="crear_guia_entrada.php">Crear Guia de Ingreso</a>
-                <a class="item" href="lista_guia_entrada.php">Lista de Guias de Ingreso</a>
-            </div>
-        </div>
-        <div class="ui dropdown item">
-            VENTAS <i class="dropdown icon"></i>
-            <div class="menu">
-                <a class="item" href="crear_nota_venta.php">Crear Nota de Venta</a>
-                <a class="item" href="lista_nota_venta.php">Lista Notas de venta</a>
-            </div>
-        </div>
-        <div class="ui dropdown item">
-            CONFIGURACIONES <i class="dropdown icon"></i>
-            <div class="menu">
-                <a class="item" href="configuraciones.php">Gestión de Usuarios</a>
-                <a class="item">Otras Configuraciones</a>
-            </div>
-        </div>
+    </div>
+  <?}?>
+
+
+
+
         <div class="right menu">
             <div class="ui dropdown item">
                 <i class="user icon"></i>
                 <span class="username-text"><?php echo $nombreUsuario; ?></span> <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a class="item" href="perfil_usuario.php">Perfil</a>
+                    <a class="item" href="<?echo $url_base?>perfil_usuario.php">Perfil</a>
                     <a class="item" href="logout.php">Cerrar sesión</a>
                 </div>
             </div>

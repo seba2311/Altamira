@@ -11,7 +11,7 @@ function sendJsonResponse($success, $data, $message = '') {
 }
 
 try {
-    require "config.php";
+    require "../config.php";
 
     if (!isset($_GET['codigo'])) {
         throw new Exception("Código de producto no proporcionado");
