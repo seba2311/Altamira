@@ -1,42 +1,42 @@
 <?php
 if (!isset($nombreUsuario)) {
-    $nombreUsuario = isset($_SESSION['usuario']) ? htmlspecialchars($_SESSION['usuario']) : 'Usuario';
+    $nombreUsuario = $_SESSION['usuario'] ?? 'Usuario';
+    $nombreUsuario = htmlspecialchars($nombreUsuario, ENT_QUOTES, 'UTF-8');
 }
 require 'navegacion.php';
-$url_base="http://localhost:8080/Altamira/";
+$url_base = "http://192.168.18.170/";
 ?>
 
 <div class="ui blue inverted menu" id="main-menu">
     <div class="ui container">
         <div class="logo-container item">
-            <img src="<?echo $url_base?>imagenes/altamira.jpg" alt="Altamira Logo">
+            <img src="<?= $url_base ?>imagenes/altamira.jpg" alt="Altamira Logo">
         </div>
-        <a class="item" href="<?echo $url_base?>pag_principal.php">RFID</a>
+        <a class="item" href="<?= $url_base ?>pag_principal.php">RFID</a>
 
-    <?        
-    foreach($navegacion as $seccion => $paginas){
-    ?>
-    <div class="ui dropdown item">
-        <? echo $seccion;?> <i class="dropdown icon"></i>
-        <div class="menu">
-            <?
-            foreach($paginas as $nombre => $url){
-                echo "<a class='item' href='$url_base$url'>$nombre</a>";
-            }
-            ?>
-        </div>
-    </div>
-  <?}?>
-
-
-
+        <?php
+        foreach ($navegacion as $seccion => $paginas) :
+        ?>
+            <div class="ui dropdown item">
+                <?= htmlspecialchars($seccion, ENT_QUOTES, 'UTF-8') ?> <i class="dropdown icon"></i>
+                <div class="menu">
+                    <?php
+                    foreach ($paginas as $nombre => $url) :
+                        $fullUrl = $url_base . htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+                        $nombreEscapado = htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8');
+                        echo "<a class='item' href='{$fullUrl}'>{$nombreEscapado}</a>";
+                    endforeach;
+                    ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
 
         <div class="right menu">
             <div class="ui dropdown item">
                 <i class="user icon"></i>
-                <span class="username-text"><?php echo $nombreUsuario; ?></span> <i class="dropdown icon"></i>
+                <span class="username-text"><?= $nombreUsuario ?></span> <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a class="item" href="<?echo $url_base?>perfil_usuario.php">Perfil</a>
+                    <a class="item" href="<?= $url_base ?>perfil_usuario.php">Perfil</a>
                     <a class="item" href="logout.php">Cerrar sesión</a>
                 </div>
             </div>
@@ -46,6 +46,7 @@ $url_base="http://localhost:8080/Altamira/";
         <i class="bars icon"></i>
     </a>
 </div>
+
 
 <style>
     @media screen and (max-width: 768px) {
@@ -101,23 +102,23 @@ $url_base="http://localhost:8080/Altamira/";
 </style>
 
 <script>
-$(document).ready(function() {
-    $('.ui.dropdown').dropdown();
+    document.addEventListener('DOMContentLoaded', function() {
+        $('.ui.dropdown').dropdown();
 
-    $('#menu-toggle').click(function() {
-        $('.ui.container').toggleClass('active');
-    });
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            document.querySelector('.ui.container').classList.toggle('active');
+        });
 
-    // Cerrar menú al hacer clic fuera de él
-    $(document).click(function(event) {
-        if (!$(event.target).closest('#main-menu').length) {
-            $('.ui.container').removeClass('active');
-        }
-    });
+        // Cerrar menú al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('#main-menu')) {
+                document.querySelector('.ui.container').classList.remove('active');
+            }
+        });
 
-    // Prevenir que los clics dentro del menú lo cierren
-    $('#main-menu').click(function(event) {
-        event.stopPropagation();
+        // Prevenir que los clics dentro del menú lo cierren
+        document.getElementById('main-menu').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
     });
-});
 </script>

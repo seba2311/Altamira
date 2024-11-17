@@ -1,7 +1,7 @@
-<?
+<?php
 $navegacion = array(
     "Productos" => array(
-        "Crear nuevo producto" =>"productos/productos.php",
+        "Crear nuevo producto" => "productos/productos.php",
         "Lista de productos" => "productos/productos_lista.php"
     ),
     "Procesos" => array(
