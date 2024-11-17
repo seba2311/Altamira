@@ -4,7 +4,7 @@ if (!isset($nombreUsuario)) {
     $nombreUsuario = htmlspecialchars($nombreUsuario, ENT_QUOTES, 'UTF-8');
 }
 require 'navegacion.php';
-$url_base = "http://192.168.18.170/";
+$url_base = "http://192.168.18.170/altamira/";
 ?>
 
 <div class="ui blue inverted menu" id="main-menu">
