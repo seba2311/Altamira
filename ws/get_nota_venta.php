@@ -34,13 +34,16 @@ try {
         throw new Exception('Nota de venta ya atendida');
     }
     
-    // Si llegamos aquí, la nota existe y está pendiente
-    // Obtener el detalle de la nota con información de productos
+    // Obtener el detalle de la nota con información de productos y etiquetas disponibles
     $queryDetalle = "SELECT d.ndet_producto, d.ndet_cantidad, 
-                            p.pro_codigo, p.pro_nombre
+                            p.pro_codigo, p.pro_nombre,
+                            GROUP_CONCAT(e.eti_numero) as etiquetas_disponibles
                      FROM detalle_nota_venta d
                      JOIN producto p ON d.ndet_producto = p.pro_codigo
-                     WHERE d.ndet_nota_venta = :folio";
+                     LEFT JOIN etiquetas e ON e.eti_producto = p.pro_codigo 
+                            AND e.eti_nota_venta IS NULL
+                     WHERE d.ndet_nota_venta = :folio
+                     GROUP BY d.ndet_producto, d.ndet_cantidad, p.pro_codigo, p.pro_nombre";
                      
     $stmtDetalle = $conn->prepare($queryDetalle);
     $stmtDetalle->bindParam(':folio', $folio);
@@ -59,12 +62,18 @@ try {
                 'glosa' => $notaVenta['nv_glosa']
             ],
             'detalle' => array_map(function($item) {
+                // Convertir el string de etiquetas a array
+                $etiquetas = !empty($item['etiquetas_disponibles']) 
+                    ? explode(',', $item['etiquetas_disponibles']) 
+                    : [];
+                
                 return [
                     'producto' => [
                         'codigo' => $item['pro_codigo'],
                         'nombre' => $item['pro_nombre']
                     ],
-                    'cantidad' => $item['ndet_cantidad']
+                    'cantidad' => $item['ndet_cantidad'],
+                    'etiquetas_disponibles' => $etiquetas
                 ];
             }, $detalle)
         ]
