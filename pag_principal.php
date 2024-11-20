@@ -7,7 +7,7 @@ if (!isset($_SESSION['usuario'])) {
 $nombreUsuario = htmlspecialchars($_SESSION['usuario']);
 
 require_once "graficos.php";
-require_once "grafico_ventas.php"; // Asegúrate de que este archivo existe y contiene las funciones necesarias
+require_once "grafico_ventas.php";
 
 $topProducts = obtenerTopProductosStock(10);
 $productosBajos = obtenerProductosBajos(10);
@@ -16,10 +16,11 @@ $productosBajos = obtenerProductosBajos(10);
 $fechaInicio = isset($_GET['fecha_inicio']) ? $_GET['fecha_inicio'] : date('Y-m-d', strtotime('-1 month'));
 $fechaFin = isset($_GET['fecha_fin']) ? $_GET['fecha_fin'] : date('Y-m-d');
 $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10);
-
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +29,7 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <style>
         body {
             background-color: #f8f8f8;
@@ -65,7 +67,6 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
             margin-top: 2em;
         }
 
-        /* Estilos adicionales para el menú desplegable */
         .ui.dropdown .menu {
             border-radius: 0;
         }
@@ -74,20 +75,28 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
             padding: 0.78571429em 1.14285714em !important;
         }
 
-        /*css del grafico */
-        #stockChartHigh, #stockChartLow {
-        width: 100%;
-        height: 100%; /* Ocupará todo el alto del contenedor */
-    }
-    .chart-container {
+        #stockChartLow {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-container {
             background-color: #f9f9f9;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            height: 400px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Eliminar height: 400px; o modificarlo */
+            height: auto;
+            /* Permitir que se ajuste al contenido */
+            min-height: 400px;
+            /* Establecer una altura mínima */
             position: relative;
             margin-bottom: 20px;
+        }
+
+        .chart-container.chart-fixed-height {
+            height: 400px;
         }
 
         .ui.header {
@@ -95,7 +104,6 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
             color: #333;
         }
 
-        /* Ajuste para el contenedor principal de los gráficos */
         .main.container {
             margin-top: 2em;
             margin-bottom: 2em;
@@ -103,25 +111,23 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
             margin-right: auto;
         }
 
-        /* Estilos responsivos */
         @media (max-width: 768px) {
-
-            #stockChartHigh,
             #stockChartLow {
                 height: 300px;
-                /* Altura reducida para dispositivos móviles */
             }
         }
+
         #ventasChart {
             width: 100%;
             height: 100%;
         }
+
         .date-range-form {
             margin-bottom: 15px;
         }
-   
     </style>
 </head>
+
 <body>
     <?php include 'menu.php'; ?>
 
@@ -133,12 +139,13 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
 
     <div class="main container">
         <div class="ui two column stackable grid">
+            <!-- Listado de Mayor Stock -->
             <div class="column">
                 <div class="chart-container">
-                    <h2 class="ui header">Top 10 Productos con Mayor Stock</h2>
-                    <canvas id="stockChartHigh"></canvas>
+                    <?php echo generarListaTopProductos($topProducts); ?>
                 </div>
             </div>
+            <!-- Gráfico de Menor Stock -->
             <div class="column">
                 <div class="chart-container">
                     <h2 class="ui header">Top 10 Productos con Menor Stock</h2>
@@ -146,7 +153,8 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
                 </div>
             </div>
         </div>
-        
+
+        <!-- Gráfico de Ventas -->
         <div class="ui one column stackable grid" id="grafico_venta">
             <div class="column">
                 <div class="chart-container">
@@ -174,8 +182,13 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
         function updateDateTime() {
             const now = new Date();
             const options = {
-                year: 'numeric', month: 'long', day: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
             };
             $('#current-datetime').text(now.toLocaleDateString('es-ES', options).replace(',', '|'));
         }
@@ -184,14 +197,17 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
             updateDateTime();
             setInterval(updateDateTime, 1000);
 
+            Chart.register(ChartDataLabels);
             $('.ui.dropdown').dropdown();
 
-            // Función para inicializar un gráfico
             function initChart(canvasId, chartConfig) {
-                var ctx = document.getElementById(canvasId).getContext('2d');
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+
+                var ctx = canvas.getContext('2d');
                 if (chartConfig.options && chartConfig.options.plugins && chartConfig.options.plugins.tooltip) {
                     for (var callbackName in chartConfig.options.plugins.tooltip.callbacks) {
-                        chartConfig.options.plugins.tooltip.callbacks[callbackName] = 
+                        chartConfig.options.plugins.tooltip.callbacks[callbackName] =
                             eval('(' + chartConfig.options.plugins.tooltip.callbacks[callbackName] + ')');
                     }
                 }
@@ -203,11 +219,11 @@ $productosMasVendidos = obtenerProductosMasVendidos($fechaInicio, $fechaFin, 10)
                 }
             }
 
-            // Inicializar gráficos
-            initChart('stockChartHigh', <?php echo generarGraficoTopProductos('stockChartHigh', $topProducts); ?>);
+            // Inicializar solo los gráficos que existen
             initChart('stockChartLow', <?php echo generarGraficoProductosBajos('stockChartLow', $productosBajos); ?>);
             initChart('ventasChart', <?php echo generarGraficoProductosMasVendidos('ventasChart', $productosMasVendidos); ?>);
         });
     </script>
 </body>
+
 </html>

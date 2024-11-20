@@ -70,6 +70,37 @@ function generarGraficoTopProductos($idCanvas, $datos) {
 
     return json_encode($chartData, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
 }
+
+function generarListaTopProductos($datos) {
+    $html = '
+    <div class="ui divided list">
+        <h3 class="ui header">Top 10 Productos con Mayor Stock</h3>';
+    
+    foreach ($datos as $index => $producto) {
+        $rank = $index + 1;
+        $html .= '
+        <div class="item">
+            <div class="content">
+                <div class="header">
+                    <div class="ui grid">
+                        <div class="twelve wide column">
+                            #' . $rank . ' - ' . htmlspecialchars($producto['pro_nombre']) . '
+                        </div>
+                        <div class="four wide column right aligned">
+                            <span class="ui large label">
+                                ' . $producto['stock_cantidad'] . ' unidades
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+    }
+    
+    $html .= '</div>';
+    return $html;
+}
+
 function obtenerProductosBajos($limit = 10) {
     global $conn;
     $sql = "SELECT p.pro_nombre, s.stock_cantidad 
@@ -113,9 +144,22 @@ function generarGraficoProductosBajos($idCanvas, $datos) {
                 'title' => [
                     'display' => true,
                     'text' => 'Top ' . count($datos) . ' Productos con Menor Stock'
+                ],
+                'datalabels' => [
+                    'anchor' => 'end',
+                    'align' => 'top',
+                    'color' => '#000000',
+                    'offset' => 4,
+                    'font' => [
+                        'weight' => 'bold',
+                        'size' => 12
+                    ],
+                    'formatter' => 'function(value) { return value; }',
+                    'display' => true
                 ]
             ]
-        ]
+        ],
+        'plugins' => ['datalabels']
     ];
 
     return json_encode($chartData, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
