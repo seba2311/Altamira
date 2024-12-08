@@ -19,5 +19,8 @@ $navegacion = array(
     "Configuraciones" => array(
         "Gestión de Usuarios" => "configuraciones/configuraciones.php",
         "Otras Configuraciones" => "#"
+    ),
+    "Minería de Datos" => array(
+        "Visualización de Datos" => "mineria/vista_datos.php"
     )
 );
