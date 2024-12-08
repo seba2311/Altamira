@@ -17,6 +17,13 @@ class VentasPredictor {
     }
 
     private function cargarDatosHistoricos() {
+      
+        $sql_fecha = "SELECT MAX(nv_fecha) as fecha_max FROM nota_venta WHERE nv_estado = 'TER'";
+        $stmt = $this->conn->prepare($sql_fecha);
+        $stmt->execute();
+        $fecha_max = $stmt->fetch(PDO::FETCH_ASSOC)['fecha_max'];
+    
+  
         $sql = "SELECT 
                     DATE_FORMAT(n.nv_fecha, '%Y-%m') as mes,
                     p.pro_codigo,
@@ -26,14 +33,14 @@ class VentasPredictor {
                 JOIN detalle_nota_venta d ON n.nv_folio = d.ndet_nota_venta
                 JOIN producto p ON d.ndet_producto = p.pro_codigo
                 WHERE n.nv_estado = 'TER'
+                AND n.nv_fecha >= DATE_SUB(?, INTERVAL 3 MONTH)
                 GROUP BY DATE_FORMAT(n.nv_fecha, '%Y-%m'), p.pro_codigo, p.pro_nombre
                 ORDER BY mes DESC, p.pro_codigo";
         
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([$fecha_max]);
         $this->datos_historicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
     public function obtenerFechaMasReciente() {
         $sql = "SELECT MAX(nv_fecha) as fecha_max FROM nota_venta WHERE nv_estado = 'TER'";
         $stmt = $this->conn->prepare($sql);
@@ -156,24 +163,37 @@ class VentasPredictor {
     }
 
     private function calcularConfianza($datos) {
-        if (count($datos) < 2) return 0;
-
+        $fecha_max = max(array_column($datos, 'mes'));
+        $tres_meses_atras = date('Y-m', strtotime($fecha_max . '-01 -2 months'));
+        
+        $datos_filtrados = array_filter($datos, function($item) use ($tres_meses_atras) {
+            return $item['mes'] >= $tres_meses_atras;
+        });
+    
+        if (count($datos_filtrados) <= 1) {
+            return 0;
+        }
+    
         $variaciones = [];
         $total_cantidad = 0;
-
-        for ($i = 1; $i < count($datos); $i++) {
-            $actual = floatval($datos[$i-1]['cantidad_total']);
-            $anterior = floatval($datos[$i]['cantidad_total']);
+    
+        usort($datos_filtrados, function($a, $b) {
+            return strcmp($b['mes'], $a['mes']);
+        });
+    
+        for ($i = 1; $i < count($datos_filtrados); $i++) {
+            $actual = floatval($datos_filtrados[$i-1]['cantidad_total']);
+            $anterior = floatval($datos_filtrados[$i]['cantidad_total']);
             $variacion = abs($actual - $anterior);
             $variaciones[] = $variacion;
             $total_cantidad += $actual;
         }
-        $total_cantidad += floatval($datos[count($datos)-1]['cantidad_total']);
-
+        $total_cantidad += floatval($datos_filtrados[count($datos_filtrados)-1]['cantidad_total']);
+    
         if (empty($variaciones) || $total_cantidad == 0) return 0;
-
+    
         $variacion_promedio = array_sum($variaciones) / count($variaciones);
-        $promedio_mensual = $total_cantidad / count($datos);
+        $promedio_mensual = $total_cantidad / count($datos_filtrados);
         
         if ($promedio_mensual == 0) return 0;
         
