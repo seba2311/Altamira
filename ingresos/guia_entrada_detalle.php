@@ -15,7 +15,8 @@ if (!$folio) {
 $mensaje = '';
 
 // Función para recepcionar la guía
-function recepcionarGuia($conn, $folio) {
+function recepcionarGuia($conn, $folio)
+{
     try {
         $conn->beginTransaction();
 
@@ -85,6 +86,7 @@ $detalles = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -93,11 +95,12 @@ $detalles = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
 </head>
+
 <body>
     <?php include '../menu.php'; ?>
     <div class="ui container" style="margin-top: 20px;">
         <h2 class="ui header">Detalle de Guía de Entrada</h2>
-        
+
         <?php if ($mensaje): ?>
             <div class="ui message">
                 <?php echo $mensaje; ?>
@@ -109,7 +112,7 @@ $detalles = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
             <p><strong>Folio:</strong> <?php echo htmlspecialchars($guia_entrada['guia_folio']); ?></p>
             <p><strong>Fecha:</strong> <?php echo date('d-m-Y', strtotime($guia_entrada['guia_fecha'])); ?></p>
             <p><strong>Glosa:</strong> <?php echo htmlspecialchars($guia_entrada['guia_glosa']); ?></p>
-            <p><strong>Estado:</strong> 
+            <p><strong>Estado:</strong>
                 <?php
                 if ($guia_entrada['guia_estado'] == 'PND') {
                     echo 'Pendiente por recepcionar';
@@ -141,20 +144,51 @@ $detalles = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
                 </tbody>
             </table>
         </div>
-        
+
         <?php if ($guia_entrada['guia_estado'] == 'PND'): ?>
             <form method="POST" class="ui form">
                 <button type="submit" name="recepcionar" class="ui button primary">Recepcionar Todo</button>
             </form>
         <?php endif; ?>
         <br>
+        <button onclick="mostrarPDF()" class="ui button blue">
+            <i class="print icon"></i> Ver PDF
+        </button>
+
         <a href="lista_guia_entrada.php" class="ui button green">Volver al listado</a>
     </div>
 
+    <div class="ui segment" style="display: none;" id="pdfContainer">
+        <div class="ui centered container">
+            <iframe id="pdfFrame" style="width: 100%; height: 600px; border: none;"></iframe>
+        </div>
+    </div>
+
     <script>
-    $(document).ready(function() {
-        $('.ui.dropdown').dropdown();
-    });
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
     </script>
 </body>
+
 </html>
+
+
+<script>
+    function mostrarPDF() {
+        const pdfContainer = document.getElementById('pdfContainer');
+        const pdfFrame = document.getElementById('pdfFrame');
+        const folio = '<?php echo $folio; ?>';
+
+        // Mostrar el contenedor
+        pdfContainer.style.display = 'block';
+
+        // Cargar el PDF en el iframe
+        pdfFrame.src = 'generar_guia_pdf.php?folio=' + folio;
+
+        // Hacer scroll hasta el PDF
+        pdfContainer.scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
+</script>

@@ -1,0 +1,18 @@
+{
+    "name": "sebastian/altamira",
+    "require-dev": {
+        "tecnickcom/tcpdf": "^6.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sebastian\\Altamira\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "seba2311",
+            "email": "villarroel.paiva.sebastian@gmail.com"
+        }
+    ],
+    "require": {}
+}
