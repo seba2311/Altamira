@@ -154,6 +154,9 @@ $detalles = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
         <button onclick="mostrarPDF()" class="ui button blue">
             <i class="print icon"></i> Ver PDF
         </button>
+        <button onclick="mostrarEtiquetas()" class="ui button orange">
+            <i class="tags icon"></i> Ver Etiquetas
+        </button>
 
         <a href="lista_guia_entrada.php" class="ui button green">Volver al listado</a>
     </div>
@@ -185,6 +188,23 @@ $detalles = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
 
         // Cargar el PDF en el iframe
         pdfFrame.src = 'generar_guia_pdf.php?folio=' + folio;
+
+        // Hacer scroll hasta el PDF
+        pdfContainer.scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
+
+    function mostrarEtiquetas() {
+        const pdfContainer = document.getElementById('pdfContainer');
+        const pdfFrame = document.getElementById('pdfFrame');
+        const folio = '<?php echo $folio; ?>';
+
+        // Mostrar el contenedor
+        pdfContainer.style.display = 'block';
+
+        // Cargar el PDF de etiquetas en el iframe
+        pdfFrame.src = 'etiquetas_pdf.php?folio=' + folio;
 
         // Hacer scroll hasta el PDF
         pdfContainer.scrollIntoView({

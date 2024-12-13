@@ -5,7 +5,7 @@
 $host = '127.0.0.1:3060';
 $db_name = 'altamira';
 $username = 'root';
-$password = 'root';
+$password = '';
 
 // Opciones para PDO
 $options = [
